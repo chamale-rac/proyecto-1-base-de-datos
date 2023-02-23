@@ -1,0 +1,7 @@
+id                 TEXT,
+player_api_id      TEXT UNIQUE ,
+player_name        TEXT,
+player_fifa_api_id TEXT,
+birthday           TIMESTAMP,
+height             NUMERIC,
+weight             INTEGER,

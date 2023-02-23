@@ -1,0 +1,5 @@
+id               TEXT,
+team_api_id      TEXT UNIQUE,
+team_fifa_api_id TEXT,
+team_long_name   TEXT,
+team_short_name   TEXT,
