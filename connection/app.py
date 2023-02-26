@@ -19,7 +19,10 @@ cursor = create_cursor(connection)
 # print('Country', auto_insert_data(connection, cursor, 'Country'))
 # print('League', auto_insert_data(connection, cursor, 'League'))
 # print('Team', auto_insert_data(connection, cursor, 'Team'))
-
-print('Player', auto_insert_data(connection, cursor, 'Player'))
+# print('Player', auto_insert_data(connection, cursor, 'Player'))
+# print('Team_Attributes', auto_insert_data(connection, cursor, 'Team_Attributes'))
+# print('Player_Attributes', auto_insert_data(connection, cursor, 'Player_Attributes'))
+print('Match', auto_insert_data(
+    connection, cursor, 'Match'))
 
 close_connection(connection)

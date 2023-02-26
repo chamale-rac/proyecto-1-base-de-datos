@@ -1,4 +1,5 @@
 from pd_read_csv import read_csv_file
+import numpy as np
 
 
 def get_insert_format(names_and_types, table):
@@ -33,15 +34,38 @@ def get_values_format(names_and_types):
     return format
 
 
+def set_null(value):
+    value_f = float(value)
+    if (np.isnan(value_f)):
+        return 'NULL'
+    else:
+        return value
+
+
+def change_int(value):
+    try:
+        return int(value)
+    except:
+        return set_null(value)
+
+
 def get_execute_format(insert_format, values_format, table, names):
     data = read_csv_file('./data', table + '.csv')
+
     data_list = data[names].values.tolist()
     format = insert_format
     length = len(data_list)
     iteration = 0
     for row in data_list:
+        if (table.lower() == 'match'):
+            for i in range(11, 33):
+                row[i] = change_int(row[i])
+
         row = [r.replace("'", "''") if (type(r) == str) else r for r in row]
+        row = [set_null(r) if (type(r) == int or type(r)
+                               == float) else r for r in row]
         values = values_format.format(*row)
+        # print(values)
         format += values
         if (iteration != length-1):
             format += ", "

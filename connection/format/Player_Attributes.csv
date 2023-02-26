@@ -1,7 +1,7 @@
 id                  TEXT,
 player_fifa_api_id  TEXT,
 player_api_id       TEXT,
-_date               TIMESTAMP,
+date                TIMESTAMP,
 overall_rating      INTEGER,
 potential           INTEGER,
 crossing            INTEGER,
