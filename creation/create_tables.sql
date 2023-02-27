@@ -21,7 +21,7 @@ CREATE TABLE team
     team_api_id      TEXT UNIQUE,
     team_fifa_api_id TEXT,
     team_long_name   TEXT,
-    tam_short_name   TEXT,
+    team_short_name   TEXT,
     PRIMARY KEY (id)
 );
 
@@ -42,7 +42,7 @@ CREATE TABLE team_attributes
     id                             TEXT,
     team_fifa_api_id               TEXT,
     team_api_id                    TEXT,
-    _date                          TIMESTAMP,
+    date                           TIMESTAMP,
     buildUpPlaySpeed               INTEGER,
     buildUpPlaySpeedClass          TEXT,
     buildUpPlayDribbling           INTEGER,
@@ -63,18 +63,18 @@ CREATE TABLE team_attributes
     defenceAggressionClass         TEXT,
     defenceTeamWidth               INTEGER,
     defenceTeamWidthClass          TEXT,
-    defenceDefenderLineClass       INTEGER,
+    defenceDefenderLineClass       TEXT,
     PRIMARY KEY (id),
     FOREIGN KEY (team_api_id)
         REFERENCES team (team_api_id)
 );
 
-CREATE TABLE player_attribute
+CREATE TABLE player_attributes
 (
     id                  TEXT,
     player_fifa_api_id  TEXT,
     player_api_id       TEXT,
-    _date               TIMESTAMP,
+    date                TIMESTAMP,
     overall_rating      INTEGER,
     potential           INTEGER,
     crossing            INTEGER,
@@ -125,7 +125,7 @@ CREATE TABLE match
     league_id        TEXT,
     season           TEXT,
     stage            INTEGER,
-    _date            TIMESTAMP,
+    date            TIMESTAMP,
     match_api_id     TEXT,
     home_team_api_id TEXT,
     away_team_api_id TEXT,
