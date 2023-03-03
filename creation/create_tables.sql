@@ -237,3 +237,9 @@ CREATE TABLE match
     FOREIGN KEY (away_player_11)
         REFERENCES player (player_api_id)
 );
+
+CREATE TABLE faults (
+    match_api_id TEXT,
+    home_faults INTEGER,
+    away_faults INTEGER
+);
