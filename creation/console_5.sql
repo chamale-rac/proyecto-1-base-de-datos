@@ -1,5 +1,5 @@
 ----------------------------------------
---1
+-- 1)
 ----------------------------------------
 WITH matches_per_season_all_teams AS (SELECT team_api_id, season, SUM(num_of_matches) as total_num_of_matches
                                       FROM ((SELECT away_team_api_id as team_api_id, season, count(*) as num_of_matches
@@ -16,7 +16,7 @@ FROM matches_per_season_all_teams mpsat
 ORDER BY (t.team_long_name, season);
 
 ----------------------------------------
---2
+-- 2)
 ----------------------------------------
 WITH goals_per_season_and_league_all_teams AS (SELECT team_api_id,
                                                       season,
@@ -54,7 +54,7 @@ FROM goals_per_season_and_league_all_teams gpsalat
          JOIN league l on l.id = gpsalat.league_id;
 
 ----------------------------------------
---3
+-- 3)
 ----------------------------------------
 WITH win_prob AS ((SELECT home_team_api_id as team_id,
                           season,
@@ -85,7 +85,7 @@ WHERE B365W_AVG > 0
   AND BSW_AVG > 0;
 
 ----------------------------------------
--- 4
+-- 4)
 ----------------------------------------
 WITH quotes_avg AS ((SELECT home_team_api_id as team_id,
                             season,
@@ -291,7 +291,7 @@ SELECT *
 FROM best_players_in_best_teams;
 
 ----------------------------------------
--- 6
+-- 6)
 ----------------------------------------
 WITH team_total_faults AS (SELECT team_api_id, SUM(num_faults) AS total_faults
                            FROM ((SELECT match.home_team_api_id  AS team_api_id,
@@ -311,7 +311,7 @@ FROM team_total_faults ttf
          JOIN team t ON ttf.team_api_id = t.team_api_id;
 
 ----------------------------------------
--- 7
+-- 7)
 ----------------------------------------
 WITH goals_per_season_and_league_all_teams AS (SELECT team_api_id,
                                                       season,
