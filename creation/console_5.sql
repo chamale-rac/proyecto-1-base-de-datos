@@ -364,3 +364,59 @@ FROM team_attributes
 WHERE team_api_id IN (SELECT best_teams.team_api_id
                       FROM best_teams);
 
+----------------------------------------
+-- 8)
+----------------------------------------
+-- 8.1) Segun apuestas
+----------------------------------------
+WITH quotes_avg AS ((SELECT home_team_api_id as team_id,
+                            season,
+                            league_id,
+                            AVG(B365H)       AS B365W_AVG,
+                            AVG(BWH)         AS BWW_AVG,
+                            AVG(LBH)         AS LBW_AVG,
+                            AVG(PSH)         AS PSW_AVG,
+                            AVG(WHH)         AS WHW_AVG,
+                            AVG(SJH)         AS SJW_AVG,
+                            AVG(VCH)         AS VCW_AVG,
+                            AVG(GBH)         AS GBW_AVG,
+                            AVG(BSH)         AS BSW_AVG
+                     FROM match
+                     GROUP BY home_team_api_id, season, league_id)
+),
+teams_and_quotes_avg_join AS (
+SELECT team_long_name,
+       team_api_id,
+       season,
+       league_id,
+       (100 / B365W_AVG + 100 / BWW_AVG + 100 / LBW_AVG + 100 / PSW_AVG + 100 / WHW_AVG + 100 / SJW_AVG +
+        100 / VCW_AVG + 100 / GBW_AVG + 100 / BSW_AVG) / 9 AS win_prob_avg,
+       RANK() OVER (
+           ORDER BY ((100 / B365W_AVG + 100 / BWW_AVG + 100 / LBW_AVG + 100 / PSW_AVG + 100 / WHW_AVG + 100 / SJW_AVG +
+                      100 / VCW_AVG + 100 / GBW_AVG + 100 / BSW_AVG) / 9) DESC
+           )                                               AS win_prob_rank
+FROM quotes_avg qa
+         JOIN team t ON qa.team_id = t.team_api_id
+WHERE B365W_AVG > 0
+  AND BWW_AVG > 0
+  AND LBW_AVG > 0
+  AND PSW_AVG > 0
+  AND WHW_AVG > 0
+  AND SJW_AVG > 0
+  AND VCW_AVG > 0
+  AND GBW_AVG > 0
+  AND BSW_AVG > 0
+),
+team_win_prob_avg_and_country_match AS (
+SELECT team_long_name, win_prob_avg, country_id, country.name AS country_name, league_id, league.name AS league_name
+FROM teams_and_quotes_avg_join
+INNER JOIN league
+    ON teams_and_quotes_avg_join.league_id = league.id
+INNER JOIN country
+    ON league.country_id = country.id
+)
+SELECT country_name, AVG(win_prob_avg) AS win_average_all_country_teams
+FROM team_win_prob_avg_and_country_match
+GROUP BY country_name
+ORDER BY win_average_all_country_teams DESC
+LIMIT 3;
