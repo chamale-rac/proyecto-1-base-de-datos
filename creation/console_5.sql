@@ -420,3 +420,83 @@ FROM team_win_prob_avg_and_country_match
 GROUP BY country_name
 ORDER BY win_average_all_country_teams DESC
 LIMIT 3;
+
+----------------------------------------
+-- 8.2) Segun estadisticas
+----------------------------------------
+WITH goals_per_season_and_league_all_teams AS (SELECT team_api_id,
+                                                      season,
+                                                      league_id,
+                                                      SUM(goals)         as total_goals,
+                                                      SUM(against_goals) as total_against_goals
+                                               FROM ((SELECT away_team_api_id    as team_api_id,
+                                                             season,
+                                                             league_id,
+                                                             SUM(away_team_goal) as goals,
+                                                             SUM(home_team_goal) as against_goals
+                                                      FROM match
+                                                      GROUP BY away_team_api_id, season, league_id)
+                                                     UNION ALL
+                                                     (SELECT home_team_api_id    as team_api_id,
+                                                             season,
+                                                             league_id,
+                                                             SUM(home_team_goal) as goals,
+                                                             SUM(away_team_goal) as against_goals
+                                                      FROM match
+                                                      GROUP BY home_team_api_id, season, league_id)) AS teams_goals_stats
+                                               GROUP BY team_api_id, season, league_id
+                                                        ),
+difference_per_season AS (
+    SELECT t.team_long_name,
+           season,
+           l.id,
+           l.name,
+           total_goals,
+           total_against_goals,
+           (total_goals - total_against_goals) AS difference,
+           RANK() OVER (
+               PARTITION BY season, league_id
+               ORDER BY (total_goals - total_against_goals) DESC
+               )                                  difference_rank
+    FROM goals_per_season_and_league_all_teams gpsalat
+             JOIN team t ON t.team_api_id = gpsalat.team_api_id
+             JOIN league l on l.id = gpsalat.league_id
+),
+last_team_season AS (
+    SELECT team_long_name, MAX(season) AS last_season
+    FROM difference_per_season
+    GROUP BY team_long_name
+),
+last_team_season_statistics AS (
+    SELECT last_team_season.team_long_name AS team_long_name,
+           last_season,
+           id AS league_id,
+           name AS league_name,
+           total_goals,
+           total_against_goals,
+           difference
+    FROM last_team_season
+    INNER JOIN difference_per_season
+        ON last_team_season.team_long_name = difference_per_season.team_long_name
+        AND last_team_season.last_season = difference_per_season.season
+),
+last_season_team_and_country_match AS (
+    SELECT team_long_name,
+           league_id,
+           league_name,
+           country_id,
+           country.name AS country_name,
+           total_goals,
+           total_against_goals,
+           difference
+    FROM last_team_season_statistics
+    INNER JOIN league
+        ON last_team_season_statistics.league_id = league.id
+    INNER JOIN country
+        ON league.country_id = country.id
+)
+SELECT country_name, AVG(difference) AS goals_team_difference_average_per_country
+FROM last_season_team_and_country_match
+GROUP BY country_name
+ORDER BY goals_team_difference_average_per_country DESC
+LIMIT 3;
